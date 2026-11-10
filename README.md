@@ -9,8 +9,11 @@
 pages-proxy/
   _worker.js      # Pages Function（advanced mode）：所有请求原样交给 API_WORKER
   wrangler.toml   # 项目名 + nodejs_compat + Service binding
+  test.mjs        # node --test 用例：透传 + 缺绑定的兜底
   .gitignore
 ```
+
+仓库：https://github.com/linx-zhang/cf-pages-proxy （public）
 
 ## 现状
 
@@ -37,6 +40,18 @@ cd D:\this_code\cloudflare-workers\pages-proxy
 ```
 
 本地没有 wrangler 时，把上面的路径换成 `npx wrangler` 也行。
+
+## 测试
+
+```powershell
+node --test test.mjs
+```
+
+三个用例（已全部通过）：
+
+1. `POST /auth/login?x=1` 经中转后，下游拿到的 **method / url / header / body** 完全一致；
+2. 下游返回的 status 和 body 原样回给客户端；
+3. `env.API_WORKER` 缺失时返回 500 并在 body 里点名 `API_WORKER`（而不是静默 404）。
 
 ## 验证
 
