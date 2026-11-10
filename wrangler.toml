@@ -1,0 +1,8 @@
+name = "linx-api"
+pages_build_output_dir = "."
+compatibility_date = "2026-11-04"
+compatibility_flags = ["nodejs_compat"]
+
+[[services]]
+binding = "API_WORKER"
+service = "api-worker"
