@@ -1,4 +1,4 @@
-// Cloudflare Pages 中转层：把 api.linx.is-a.dev 上的请求原样转给 api-worker。
+// Cloudflare Pages 中转层：把 linx-api-78i.pages.dev 上的请求原样转给 api-worker。
 //
 // 部署：
 //   wrangler pages deploy --project-name linx-api --commit-dirty=true

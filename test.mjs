@@ -16,7 +16,7 @@ function stubWorker(seen) {
 
 test("forwards method, url, headers and body untouched", async () => {
 	const seen = [];
-	const request = new Request("https://api.linx.is-a.dev/auth/login?x=1", {
+	const request = new Request("https://linx-api-78i.pages.dev/auth/login?x=1", {
 		method: "POST",
 		body: JSON.stringify({ email: "a@b.c", password: "x" }),
 		headers: { "content-type": "application/json", authorization: "Bearer t" },
@@ -26,7 +26,7 @@ test("forwards method, url, headers and body untouched", async () => {
 
 	assert.equal(seen.length, 1, "downstream Worker must be called exactly once");
 	assert.equal(seen[0].method, "POST");
-	assert.equal(seen[0].url, "https://api.linx.is-a.dev/auth/login?x=1");
+	assert.equal(seen[0].url, "https://linx-api-78i.pages.dev/auth/login?x=1");
 	assert.equal(seen[0].headers.get("authorization"), "Bearer t");
 	assert.equal(await seen[0].text(), '{"email":"a@b.c","password":"x"}');
 	assert.equal(response.status, 200);
@@ -34,7 +34,7 @@ test("forwards method, url, headers and body untouched", async () => {
 
 test("returns the downstream status and body", async () => {
 	const seen = [];
-	const response = await worker.fetch(new Request("https://api.linx.is-a.dev/posts"), {
+	const response = await worker.fetch(new Request("https://linx-api-78i.pages.dev/posts"), {
 		API_WORKER: {
 			async fetch() {
 				return new Response('{"code":"ok","detail":"ok","data":[]}', {
@@ -49,7 +49,7 @@ test("returns the downstream status and body", async () => {
 });
 
 test("fails loudly when the service binding is missing", async () => {
-	const response = await worker.fetch(new Request("https://api.linx.is-a.dev/"), {});
+	const response = await worker.fetch(new Request("https://linx-api-78i.pages.dev/"), {});
 	assert.equal(response.status, 500);
 	assert.match(await response.text(), /API_WORKER/);
 });

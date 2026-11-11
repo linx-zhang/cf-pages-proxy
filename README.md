@@ -1,7 +1,7 @@
 # pages-proxy
 
-给 `api-worker` 套一层 Cloudflare Pages 自定义域名入口，让 API 对外只有 `api.linx.is-a.dev`，
-不再暴露 `*.workers.dev`。
+给 `api-worker` 套一层 Cloudflare Pages 入口：对外只有 `linx-api-78i.pages.dev`，
+不再直接暴露 `*.workers.dev`。
 
 ## 结构
 
@@ -20,12 +20,12 @@ pages-proxy/
 | 项 | 值 |
 | --- | --- |
 | Pages 项目 | `linx-api` |
-| 项目域名（固定） | `linx-api-78i.pages.dev` |
+| 入口域名（固定） | `linx-api-78i.pages.dev` |
 | Service binding | `API_WORKER` → `api-worker` |
-| 自定义域名 | `api.linx.is-a.dev`（Pages 侧已登记，等 DNS 的 CNAME 生效后自动激活） |
+| 自定义域名 | 无，直接用项目域名 |
 
 `78i` 是建项目时分配的随机后缀，**重新部署不会变**；每次部署变的只是 `89847d37.linx-api-78i.pages.dev`
-这类 8 位 hash 前缀的单次部署别名，不要把它写进 DNS。
+这类 8 位 hash 前缀的单次部署别名，不要把它写进任何地方当入口。
 
 ## 部署
 
@@ -71,11 +71,14 @@ curl.exe -sS -X POST -H 'Content-Type: application/json' -d '{"email":"a@b.c","p
 3. 绑定**只能走 `wrangler.toml`**；用 REST API 改 `deployment_configs.production.env` 会返回
    `success=true` 但 `env` 仍是 null，实际不生效。
 
-## 域名侧约束
+## 自定义域名（当前不使用）
 
-- is-a.dev 的 DNS 记录必须写 **`"CNAME": "linx-api-78i.pages.dev"` 且 `"proxied": false`**。
-  实测 `api.linx.is-a.dev` 是二级子域，开橙云会直接 `TLS alert 'HandshakeFailure'`（is-a.dev 的 zone
-  没有为二级名字签证书）；证书由 Pages 的自定义域名流程签发。
-- 注册记录需要你自己在 `is-a.dev/register` 提 PR（该仓库明确不接受 AI 生成的 PR）。
+原来计划的 `api.linx.is-a.dev` 已放弃，入口固定用 `linx-api-78i.pages.dev`。
+以后如果换成自有域名，优先把域名加在 `api-worker` 自己的 `wrangler` 配置里：
 
-完整的注册流程、实测数据和原理说明见 `..\isa\README.md`。
+```jsonc
+"routes": [{ "pattern": "api.yourdomain.com", "custom_domain": true }]
+```
+
+自有域名在同一个 CF 账号下，Workers 能直接签发证书、自动建 DNS 记录，
+这一层 Pages 中转就没有必要了；届时删掉本仓库和 `linx-api` 项目即可。
